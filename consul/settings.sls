@@ -45,12 +45,7 @@
 {%- set nodename = salt['grains.get']('nodename') %}
 {%- set force_mine_update = salt['mine.send']('network.get_hostname') %}
 {%- set servers = salt['mine.get'](server_target, 'network.get_hostname', targeting_method).values() %}
-
-# Create a list of servers that can be used to join the cluster
-{%- set join_server = None %}
-{%- for server in servers if server != nodename %}
-    {%- set join_server = server %}
-{%- endfor %}
+{%- set join_server = servers|reject('sameas', nodename)|list|random %}
 
 {%- set consul = {} %}
 {%- do consul.update({

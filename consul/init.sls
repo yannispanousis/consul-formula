@@ -91,7 +91,7 @@ consul|ensure-started:
       - file: consul|deploy-config
       - file: consul|deploy-upstart-config
 
-{%- if consul.is_server and consul.join_server %}
+{%- if consul.join_server %}
 consul|join-cluster:
   cmd.run:
     - name: consul join {{ consul.join_server }}
