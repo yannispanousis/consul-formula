@@ -45,7 +45,7 @@
 {%- set nodename = salt['grains.get']('nodename') %}
 {%- set force_mine_update = salt['mine.send']('network.get_hostname') %}
 {%- set servers = salt['mine.get'](server_target, 'network.get_hostname', targeting_method).values() %}
-{%- set join_server = servers|reject('sameas', nodename)|list|random %}
+{%- set join_servers = servers|reject('sameas', nodename)|list %}
 
 {%- set consul = {} %}
 {%- do consul.update({
@@ -69,7 +69,7 @@
     'domain': domain,
     'servers': server,
     'bootstrap_target': bootstrap_target,
-    'join_server': join_server,
+    'join_servers': join_servers,
     'datacenter': datacenter
 
 }) %}

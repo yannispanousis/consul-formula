@@ -91,10 +91,10 @@ consul|ensure-started:
       - file: consul|deploy-config
       - file: consul|deploy-upstart-config
 
-{%- if consul.join_server %}
+{%- if consul.join_servers %}
 consul|join-cluster:
   cmd.run:
-    - name: consul join {{ consul.join_server }}
+    - name: consul join {{ consul.join_servers|random }}
 {%- endif %}
 
 {% if consul.is_ui %}
