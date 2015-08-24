@@ -79,6 +79,16 @@ consul|deploy-upstart-config:
       config_file: {{ consul.config_file }}
       log_file: {{ consul.log_file }}
 
+consul|deploy-service-config:
+  file.managed:
+    - name: /etc/consul.d/services.json
+    - source: salt://consul/files/services.json
+    - template: jinja
+    - context:
+      user: {{ consul.user }}
+      group: {{ consul.group }}
+      services: {{ consul.services }}
+
 consul|ensure-started:
   service.running:
     - name: consul
@@ -90,6 +100,7 @@ consul|ensure-started:
     - watch:
       - file: consul|deploy-config
       - file: consul|deploy-upstart-config
+      - file: consul|deploy-service-config
 
 {%- if consul.join_servers %}
 consul|join-cluster:

@@ -1,0 +1,19 @@
+{
+  "services": [
+  {% for service in services %}
+  {
+    "name": "{{ service['name'] }}",
+    "address": "127.0.0.1",
+    "port": {{ service['port'] }},
+    "checks": [
+      {
+        "id": "{{ service['name'] }}",
+        "http": "{{ service['healthcheck'] }}",
+        "interval": "{{ service['healthcheck_interval'] }}",
+        "timeout": "4s"
+      }
+    ]
+  }
+  {% endfor %}
+  ]
+}
