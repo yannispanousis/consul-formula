@@ -89,13 +89,26 @@ consul|deploy-service-config:
       group: {{ consul.group }}
       services: {{ consul.services }}
 
+{% if consul.is_ui %}
+consul|install-web-ui:
+  archive.extracted:
+    - name: {{ consul.ui_install_path }}
+    - source: {{ consul.ui_source_url }}
+    - source_hash: {{ consul.ui_source_hash }}
+    - archive_format: zip
+
+# UI doesn't restart using 'reload', so doing it explicitly
+consul|restart-ui:
+  cmd.run:
+    - name: service consul restart
+    - watch:
+      - file: consul|deploy-config
+{%- endif %}
+
 consul|ensure-started:
   service.running:
     - name: consul
     - enable: True
-    # Reload set to true will just do a HUP which won't bring the UI/SSL
-    # https://consul.io/docs/agent/options.html#reloadable-configuration
-    # Says that Log level, checks, services, watches, http client address only
     - reload: True
     - watch:
       - file: consul|deploy-config
@@ -108,11 +121,3 @@ consul|join-cluster:
     - name: consul join {{ consul.join_servers|random }}
 {%- endif %}
 
-{% if consul.is_ui %}
-consul|install-web-ui:
-  archive.extracted:
-    - name: {{ consul.ui_install_path }}
-    - source: {{ consul.ui_source_url }}
-    - source_hash: {{ consul.ui_source_hash }}
-    - archive_format: zip
-{%- endif %}
