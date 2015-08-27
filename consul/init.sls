@@ -96,7 +96,7 @@ consul|ensure-started:
     # Reload set to true will just do a HUP which won't bring the UI/SSL
     # https://consul.io/docs/agent/options.html#reloadable-configuration
     # Says that Log level, checks, services, watches, http client address only
-    - reload: False
+    - reload: True
     - watch:
       - file: consul|deploy-config
       - file: consul|deploy-upstart-config

@@ -46,19 +46,32 @@
 {%- set force_mine_update = salt['mine.send']('network.get_hostname') %}
 {%- set servers = salt['mine.get'](server_target, 'network.get_hostname', targeting_method).values() %}
 {%- set join_servers = servers|reject('sameas', nodename)|list %}
-{%- set healthcheck_interval = salt['pillar.get']('consul:healthcheck_interval', '10s') %}
 
 {%- set services = [] %}
 {% for name, config  in pillar.items() %}
-{% if config is mapping and config.get('ports') and config.get('healthcheck') %}
-{% set port = config['ports'].keys()[0].split('/')[0] %}
-{% set healthcheck_port = config.get('healthcheck_port', port) %}
-{% set service = { 'name': config['name'], 
-                   'port': port,
-                   'healthcheck': 'http://127.0.0.1:' + healthcheck_port + config['healthcheck'],
-                   'healthcheck_interval': healthcheck_interval
+
+{% if config is mapping %}
+{% set healthcheck = config.get('healthcheck') %}
+{% if healthcheck and healthcheck is mapping %}
+
+{% set service = { 'name': config['name'],
+                   'healthcheck_interval': healthcheck.get('interval', '10s'),
                  } %}
+
+{% if config.get('ports') %}
+{% set _ = service.update({ 'port': config['ports'].keys()[0].split('/')[0] }) %}
+{% endif %}
+
+{% if healthcheck.get('endpoint') %}
+
+{% set healthcheck_port = healthcheck.get('port', service['port']) %}
+{% set _ = service.update({ 'healthcheck_endpoint': 'http://127.0.0.1:' + healthcheck_port + healthcheck['endpoint'] }) %}
+{% else %}
+{% set _ = service.update({ 'healthcheck_script': healthcheck['script']}) %}
+{% endif %}
+
 {{ services.append(service) }}
+{% endif %}
 {% endif %}
 {% endfor %}
 

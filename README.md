@@ -131,3 +131,40 @@ Once the datacentre is bootstraped and you have more than 1 node, you can reappl
 ```
 salt 'consul-server01' state.sls consul
 ```
+
+## Automatically generated Services from Pillar
+
+Services will be picked up from pillar items if they follow one of these formats:
+
+1. Endpoint-based healthcheck
+```
+sentry:
+  ...
+  ports:
+    9000/tcp:
+      ...
+  healthcheck:
+    endpoint: /_status
+  ...
+```
+
+The 'ports' key, the '<port>/tcp' format and the 'healthcheck' structure should match the above for a service to be added with port 9000, and a healthcheck on http://localhost:9000/_status
+
+If an alternative port should be used rather than the first one in the list, then specify:
+```
+...
+  healthcheck:
+    endpoint: /_status
+    port: 9001
+```
+
+2. Script-based healthcheck
+```
+consul:
+  ...
+  healthcheck:
+    script: ps aux | grep /usr/local/bin/consul
+  ..
+```
+
+Let's say a service doesn't expose any ports but we want to make sure it's running. A custom script can be passed to do this.

@@ -4,16 +4,25 @@
   {
     "name": "{{ service['name'] }}",
     "address": "127.0.0.1",
+    {%- if service.get('port') %}
     "port": {{ service['port'] }},
+    {% endif %}
     "checks": [
       {
         "id": "{{ service['name'] }}",
-        "http": "{{ service['healthcheck'] }}",
+        {%- if service.get('healthcheck_endpoint') %}
+        "http": "{{ service['healthcheck_endpoint'] }}",
+        {% else %}
+        "script": "{{ service['healthcheck_script'] }}",
+        {% endif %}
         "interval": "{{ service['healthcheck_interval'] }}",
         "timeout": "4s"
       }
     ]
   }
+  {% if not loop.last %}
+    ,
+  {% endif %}
   {% endfor %}
   ]
 }
