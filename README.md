@@ -148,7 +148,7 @@ sentry:
   ...
 ```
 
-The 'ports' key, the '<port>/tcp' format and the 'healthcheck' structure should match the above for a service to be added with port 9000, and a healthcheck on http://localhost:9000/_status
+The 'ports' key, the '[port]/tcp' format and the 'healthcheck' structure should match the above for a service to be added with port 9000, and a healthcheck on http://localhost:9000/_status
 
 If an alternative port should be used rather than the first one in the list, then specify:
 ```
